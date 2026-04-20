@@ -191,8 +191,7 @@
                 <version>3.13.0</version>
                 <configuration>
                     <parameters>true</parameters>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>

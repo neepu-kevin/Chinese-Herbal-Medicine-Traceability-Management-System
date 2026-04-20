@@ -30,12 +30,12 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
-         <!-- Mysql驱动包 -->
+        <!-- Mysql驱动包 -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
-
+        <!-- Redis 核心依赖（必须加在 ruoyi-admin 的 pom 中） -->
         <!-- 核心模块-->
         <dependency>
             <groupId>com.ruoyi</groupId>
@@ -80,7 +80,7 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <warName>${project.artifactId}</warName>
                 </configuration>   
-           </plugin>   
+            </plugin>   
         </plugins>
         <finalName>${project.artifactId}</finalName>
     </build>

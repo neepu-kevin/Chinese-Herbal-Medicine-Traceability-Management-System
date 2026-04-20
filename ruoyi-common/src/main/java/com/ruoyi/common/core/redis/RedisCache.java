@@ -1,10 +1,14 @@
 package com.ruoyi.common.core.redis;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
@@ -22,8 +26,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RedisCache
 {
-    @Autowired
+    @Autowired(required = false)
     public RedisTemplate redisTemplate;
+
+    // 内存缓存作为Redis的备选方案
+    private final Map<String, Object> memoryCache = new ConcurrentHashMap<>();
 
     /**
      * 缓存基本的对象，Integer、String、实体类等
@@ -33,7 +40,14 @@ public class RedisCache
      */
     public <T> void setCacheObject(final String key, final T value)
     {
-        redisTemplate.opsForValue().set(key, value);
+        if (redisTemplate != null)
+        {
+            redisTemplate.opsForValue().set(key, value);
+        }
+        else
+        {
+            memoryCache.put(key, value);
+        }
     }
 
     /**
@@ -46,7 +60,15 @@ public class RedisCache
      */
     public <T> void setCacheObject(final String key, final T value, final Integer timeout, final TimeUnit timeUnit)
     {
-        redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        if (redisTemplate != null)
+        {
+            redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        }
+        else
+        {
+            memoryCache.put(key, value);
+            // 内存缓存不支持过期时间，仅作为备选
+        }
     }
 
     /**
@@ -71,7 +93,15 @@ public class RedisCache
      */
     public boolean expire(final String key, final long timeout, final TimeUnit unit)
     {
-        return redisTemplate.expire(key, timeout, unit);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.expire(key, timeout, unit);
+        }
+        else
+        {
+            // 内存缓存不支持过期时间
+            return false;
+        }
     }
 
     /**
@@ -82,7 +112,15 @@ public class RedisCache
      */
     public long getExpire(final String key)
     {
-        return redisTemplate.getExpire(key);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.getExpire(key);
+        }
+        else
+        {
+            // 内存缓存不支持过期时间
+            return -1;
+        }
     }
 
     /**
@@ -93,7 +131,14 @@ public class RedisCache
      */
     public Boolean hasKey(String key)
     {
-        return redisTemplate.hasKey(key);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.hasKey(key);
+        }
+        else
+        {
+            return memoryCache.containsKey(key);
+        }
     }
 
     /**
@@ -104,8 +149,15 @@ public class RedisCache
      */
     public <T> T getCacheObject(final String key)
     {
-        ValueOperations<String, T> operation = redisTemplate.opsForValue();
-        return operation.get(key);
+        if (redisTemplate != null)
+        {
+            ValueOperations<String, T> operation = redisTemplate.opsForValue();
+            return operation.get(key);
+        }
+        else
+        {
+            return (T) memoryCache.get(key);
+        }
     }
 
     /**
@@ -115,7 +167,14 @@ public class RedisCache
      */
     public boolean deleteObject(final String key)
     {
-        return redisTemplate.delete(key);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.delete(key);
+        }
+        else
+        {
+            return memoryCache.remove(key) != null;
+        }
     }
 
     /**
@@ -126,7 +185,22 @@ public class RedisCache
      */
     public boolean deleteObject(final Collection collection)
     {
-        return redisTemplate.delete(collection) > 0;
+        if (redisTemplate != null)
+        {
+            return redisTemplate.delete(collection) > 0;
+        }
+        else
+        {
+            boolean deleted = false;
+            for (Object key : collection)
+            {
+                if (key instanceof String)
+                {
+                    deleted |= memoryCache.remove(key) != null;
+                }
+            }
+            return deleted;
+        }
     }
 
     /**
@@ -138,8 +212,16 @@ public class RedisCache
      */
     public <T> long setCacheList(final String key, final List<T> dataList)
     {
-        Long count = redisTemplate.opsForList().rightPushAll(key, dataList);
-        return count == null ? 0 : count;
+        if (redisTemplate != null)
+        {
+            Long count = redisTemplate.opsForList().rightPushAll(key, dataList);
+            return count == null ? 0 : count;
+        }
+        else
+        {
+            memoryCache.put(key, dataList);
+            return dataList != null ? dataList.size() : 0;
+        }
     }
 
     /**
@@ -150,7 +232,15 @@ public class RedisCache
      */
     public <T> List<T> getCacheList(final String key)
     {
-        return redisTemplate.opsForList().range(key, 0, -1);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.opsForList().range(key, 0, -1);
+        }
+        else
+        {
+            Object value = memoryCache.get(key);
+            return value instanceof List ? (List<T>) value : null;
+        }
     }
 
     /**
@@ -162,13 +252,21 @@ public class RedisCache
      */
     public <T> BoundSetOperations<String, T> setCacheSet(final String key, final Set<T> dataSet)
     {
-        BoundSetOperations<String, T> setOperation = redisTemplate.boundSetOps(key);
-        Iterator<T> it = dataSet.iterator();
-        while (it.hasNext())
+        if (redisTemplate != null)
         {
-            setOperation.add(it.next());
+            BoundSetOperations<String, T> setOperation = redisTemplate.boundSetOps(key);
+            Iterator<T> it = dataSet.iterator();
+            while (it.hasNext())
+            {
+                setOperation.add(it.next());
+            }
+            return setOperation;
         }
-        return setOperation;
+        else
+        {
+            memoryCache.put(key, dataSet);
+            return null; // 内存缓存不支持BoundSetOperations
+        }
     }
 
     /**
@@ -179,7 +277,15 @@ public class RedisCache
      */
     public <T> Set<T> getCacheSet(final String key)
     {
-        return redisTemplate.opsForSet().members(key);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.opsForSet().members(key);
+        }
+        else
+        {
+            Object value = memoryCache.get(key);
+            return value instanceof Set ? (Set<T>) value : null;
+        }
     }
 
     /**
@@ -190,8 +296,17 @@ public class RedisCache
      */
     public <T> void setCacheMap(final String key, final Map<String, T> dataMap)
     {
-        if (dataMap != null) {
-            redisTemplate.opsForHash().putAll(key, dataMap);
+        if (redisTemplate != null)
+        {
+            if (dataMap != null) {
+                redisTemplate.opsForHash().putAll(key, dataMap);
+            }
+        }
+        else
+        {
+            if (dataMap != null) {
+                memoryCache.put(key, new HashMap<>(dataMap));
+            }
         }
     }
 
@@ -203,7 +318,15 @@ public class RedisCache
      */
     public <T> Map<String, T> getCacheMap(final String key)
     {
-        return redisTemplate.opsForHash().entries(key);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.opsForHash().entries(key);
+        }
+        else
+        {
+            Object value = memoryCache.get(key);
+            return value instanceof Map ? (Map<String, T>) value : null;
+        }
     }
 
     /**
@@ -215,7 +338,21 @@ public class RedisCache
      */
     public <T> void setCacheMapValue(final String key, final String hKey, final T value)
     {
-        redisTemplate.opsForHash().put(key, hKey, value);
+        if (redisTemplate != null)
+        {
+            redisTemplate.opsForHash().put(key, hKey, value);
+        }
+        else
+        {
+            Object valueObj = memoryCache.get(key);
+            if (valueObj instanceof Map) {
+                ((Map<String, T>) valueObj).put(hKey, value);
+            } else {
+                Map<String, T> newMap = new HashMap<>();
+                newMap.put(hKey, value);
+                memoryCache.put(key, newMap);
+            }
+        }
     }
 
     /**
@@ -227,8 +364,19 @@ public class RedisCache
      */
     public <T> T getCacheMapValue(final String key, final String hKey)
     {
-        HashOperations<String, String, T> opsForHash = redisTemplate.opsForHash();
-        return opsForHash.get(key, hKey);
+        if (redisTemplate != null)
+        {
+            HashOperations<String, String, T> opsForHash = redisTemplate.opsForHash();
+            return opsForHash.get(key, hKey);
+        }
+        else
+        {
+            Object valueObj = memoryCache.get(key);
+            if (valueObj instanceof Map) {
+                return ((Map<String, T>) valueObj).get(hKey);
+            }
+            return null;
+        }
     }
 
     /**
@@ -240,7 +388,26 @@ public class RedisCache
      */
     public <T> List<T> getMultiCacheMapValue(final String key, final Collection<Object> hKeys)
     {
-        return redisTemplate.opsForHash().multiGet(key, hKeys);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.opsForHash().multiGet(key, hKeys);
+        }
+        else
+        {
+            List<T> result = new ArrayList<>();
+            Object valueObj = memoryCache.get(key);
+            if (valueObj instanceof Map) {
+                Map<String, T> map = (Map<String, T>) valueObj;
+                for (Object hKey : hKeys) {
+                    if (hKey instanceof String) {
+                        result.add(map.get(hKey));
+                    } else {
+                        result.add(null);
+                    }
+                }
+            }
+            return result;
+        }
     }
 
     /**
@@ -252,7 +419,18 @@ public class RedisCache
      */
     public boolean deleteCacheMapValue(final String key, final String hKey)
     {
-        return redisTemplate.opsForHash().delete(key, hKey) > 0;
+        if (redisTemplate != null)
+        {
+            return redisTemplate.opsForHash().delete(key, hKey) > 0;
+        }
+        else
+        {
+            Object valueObj = memoryCache.get(key);
+            if (valueObj instanceof Map) {
+                return ((Map<?, ?>) valueObj).remove(hKey) != null;
+            }
+            return false;
+        }
     }
 
     /**
@@ -263,6 +441,28 @@ public class RedisCache
      */
     public Collection<String> keys(final String pattern)
     {
-        return redisTemplate.keys(pattern);
+        if (redisTemplate != null)
+        {
+            return redisTemplate.keys(pattern);
+        }
+        else
+        {
+            // 简单实现，只支持精确匹配
+            if (pattern != null && !pattern.contains("*")) {
+                return memoryCache.containsKey(pattern) ? List.of(pattern) : Collections.emptyList();
+            }
+            // 支持简单的前缀匹配
+            if (pattern != null && pattern.endsWith("*")) {
+                String prefix = pattern.substring(0, pattern.length() - 1);
+                List<String> result = new ArrayList<>();
+                for (String key : memoryCache.keySet()) {
+                    if (key.startsWith(prefix)) {
+                        result.add(key);
+                    }
+                }
+                return result;
+            }
+            return Collections.emptyList();
+        }
     }
 }

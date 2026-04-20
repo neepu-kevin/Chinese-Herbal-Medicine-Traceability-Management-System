@@ -25,6 +25,9 @@ target/
 *.iml
 *.ipr
 
+### VSCode ###
+.vscode/
+
 ### JRebel ###
 rebel.xml
 
@@ -41,6 +44,24 @@ nbdist/
 *.log
 *.xml.versionsBackup
 *.swp
+
+######################################################################
+# Local caches / build outputs (do not commit)
+
+# Maven local repository accidentally copied into workspace
+.m2/
+
+# Spring Boot jar extracted content (accidental)
+BOOT-INF/
+
+# Local-only config copies accidentally created at repo root
+/application.yml
+/application-*.yml
+/application-druid.yml
+/logback.xml
+
+# Temporary text notes at repo root (can force-add if needed)
+/*.txt
 
 !*/build/*.java
 !*/build/*.html

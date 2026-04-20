@@ -1,10 +1,12 @@
 package com.ruoyi.framework.config;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -68,5 +70,49 @@ public class ResourcesConfig implements WebMvcConfigurer
         source.registerCorsConfiguration("/**", config);
         // 返回新的CorsFilter
         return new CorsFilter(source);
+    }
+
+    /**
+     * 消息转换器配置
+     */
+    @Bean
+    public StringHttpMessageConverter stringHttpMessageConverter()
+    {
+        StringHttpMessageConverter converter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
+        converter.setWriteAcceptCharset(true);
+        return converter;
+    }
+
+    @Bean
+    public org.springframework.http.converter.json.MappingJackson2HttpMessageConverter jackson2HttpMessageConverter()
+    {
+        org.springframework.http.converter.json.MappingJackson2HttpMessageConverter converter = new org.springframework.http.converter.json.MappingJackson2HttpMessageConverter();
+        org.springframework.http.MediaType mediaType = new org.springframework.http.MediaType("application", "json", StandardCharsets.UTF_8);
+        java.util.List<org.springframework.http.MediaType> mediaTypes = new java.util.ArrayList<>();
+        mediaTypes.add(mediaType);
+        converter.setSupportedMediaTypes(mediaTypes);
+        return converter;
+    }
+
+    @Override
+    public void extendMessageConverters(java.util.List<org.springframework.http.converter.HttpMessageConverter<?>> converters)
+    {
+        // 确保StringHttpMessageConverter使用UTF-8编码
+        for (org.springframework.http.converter.HttpMessageConverter<?> converter : converters)
+        {
+            if (converter instanceof StringHttpMessageConverter)
+            {
+                ((StringHttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8);
+                ((StringHttpMessageConverter) converter).setWriteAcceptCharset(true);
+            }
+            else if (converter instanceof org.springframework.http.converter.json.MappingJackson2HttpMessageConverter)
+            {
+                ((org.springframework.http.converter.json.MappingJackson2HttpMessageConverter) converter).setDefaultCharset(StandardCharsets.UTF_8);
+                org.springframework.http.MediaType mediaType = new org.springframework.http.MediaType("application", "json", StandardCharsets.UTF_8);
+                java.util.List<org.springframework.http.MediaType> mediaTypes = new java.util.ArrayList<>();
+                mediaTypes.add(mediaType);
+                ((org.springframework.http.converter.json.MappingJackson2HttpMessageConverter) converter).setSupportedMediaTypes(mediaTypes);
+            }
+        }
     }
 }
