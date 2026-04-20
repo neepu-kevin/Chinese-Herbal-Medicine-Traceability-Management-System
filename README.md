@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <p align="center">
 	<img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png">
 </p>
@@ -202,3 +203,6 @@ CREATE TABLE user (
     company_name VARCHAR(100),
     create_time DATETIME
 );
+=======
+# -ruoyi-
+>>>>>>> 4a17a1f0047f06690c460b564d4e867ce45c761a
