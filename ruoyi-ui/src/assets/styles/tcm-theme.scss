@@ -15,7 +15,9 @@ $tcm-border: #d8e2dc;
 }
 
 .tcm-hero {
-  background: linear-gradient(135deg, #1b4332 0%, #2d6a4f 45%, #40916c 100%);
+  background:
+    url('~@/assets/images/tcm-watermark.svg') right -120px bottom -160px / 900px auto no-repeat,
+    linear-gradient(135deg, #1b4332 0%, #2d6a4f 45%, #40916c 100%);
   border-radius: 8px;
   padding: 28px 32px;
   color: #fff;
@@ -34,6 +36,20 @@ $tcm-border: #d8e2dc;
     opacity: 0.92;
     font-size: 14px;
     line-height: 1.6;
+  }
+}
+
+.tcm-hero.is-light {
+  background:
+    url('~@/assets/images/tcm-watermark.svg') right -120px bottom -160px / 900px auto no-repeat,
+    linear-gradient(135deg, rgba(27, 67, 50, 0.06) 0%, rgba(64, 145, 108, 0.10) 100%);
+  color: $tcm-primary;
+  box-shadow: none;
+  border: 1px solid $tcm-border;
+
+  p {
+    opacity: 1;
+    color: #4b5563;
   }
 }
 

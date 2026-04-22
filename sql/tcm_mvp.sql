@@ -146,43 +146,48 @@ where not exists (select 1 from sys_role where role_key = 'tcm_buyer');
 
 -- 3) Menus
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'TCM Traceability', 0, 6, 'tcm', null, '', '', 1, 0, 'M', '0', '0', '', 'guide', 'admin', sysdate(), 'TCM root menu'
+select '中草药溯源', 0, 6, 'tcm', null, '', '', 1, 0, 'M', '0', '0', '', 'guide', 'admin', sysdate(), 'TCM root menu'
 where not exists (select 1 from sys_menu where path = 'tcm' and menu_type = 'M');
 
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'Dashboard', m.menu_id, 0, 'dashboard', 'tcm/dashboard/index', '', '', 1, 0, 'C', '0', '0', 'biz:base:list', 'chart', 'admin', sysdate(), 'TCM enterprise dashboard'
+select '工作台', m.menu_id, 0, 'dashboard', 'tcm/dashboard/index', '', '', 1, 0, 'C', '0', '0', 'biz:base:list', 'chart', 'admin', sysdate(), 'TCM enterprise dashboard'
 from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
 and not exists (select 1 from sys_menu c where c.path = 'dashboard' and c.component = 'tcm/dashboard/index');
 
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'Base', m.menu_id, 1, 'base', 'tcm/base/index', '', '', 1, 0, 'C', '0', '0', 'biz:base:list', 'tree', 'admin', sysdate(), 'Base menu'
+select '种植基地', m.menu_id, 1, 'base', 'tcm/base/index', '', '', 1, 0, 'C', '0', '0', 'biz:base:list', 'tree', 'admin', sysdate(), 'Base menu'
 from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
 and not exists (select 1 from sys_menu c where c.path = 'base' and c.component = 'tcm/base/index');
 
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'Product', m.menu_id, 2, 'product', 'tcm/product/index', '', '', 1, 0, 'C', '0', '0', 'biz:product:list', 'example', 'admin', sysdate(), 'Product menu'
+select '产品档案', m.menu_id, 2, 'product', 'tcm/product/index', '', '', 1, 0, 'C', '0', '0', 'biz:product:list', 'example', 'admin', sysdate(), 'Product menu'
 from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
 and not exists (select 1 from sys_menu c where c.path = 'product' and c.component = 'tcm/product/index');
 
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'Batch', m.menu_id, 3, 'batch', 'tcm/batch/index', '', '', 1, 0, 'C', '0', '0', 'biz:batch:list', 'date', 'admin', sysdate(), 'Batch menu'
+select '生产批次', m.menu_id, 3, 'batch', 'tcm/batch/index', '', '', 1, 0, 'C', '0', '0', 'biz:batch:list', 'date', 'admin', sysdate(), 'Batch menu'
 from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
 and not exists (select 1 from sys_menu c where c.path = 'batch' and c.component = 'tcm/batch/index');
 
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'Process', m.menu_id, 4, 'process', 'tcm/process/index', '', '', 1, 0, 'C', '0', '0', 'biz:process:list', 'form', 'admin', sysdate(), 'Process menu'
+select '环节记录', m.menu_id, 4, 'process', 'tcm/process/index', '', '', 1, 0, 'C', '0', '0', 'biz:process:list', 'form', 'admin', sysdate(), 'Process menu'
 from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
 and not exists (select 1 from sys_menu c where c.path = 'process' and c.component = 'tcm/process/index');
 
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'Trace Query', m.menu_id, 5, 'trace', 'tcm/trace/index', '', '', 1, 0, 'C', '0', '0', 'biz:trace:list', 'search', 'admin', sysdate(), 'Trace query menu'
+select '溯源码查询', m.menu_id, 5, 'trace', 'tcm/trace/index', '', '', 1, 0, 'C', '0', '0', 'biz:trace:list', 'search', 'admin', sysdate(), 'Trace query menu'
 from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
 and not exists (select 1 from sys_menu c where c.path = 'trace' and c.component = 'tcm/trace/index');
 
 insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
-select 'Review', m.menu_id, 6, 'review', 'tcm/review/index', '', '', 1, 0, 'C', '0', '0', 'biz:review:list', 'message', 'admin', sysdate(), 'Review menu'
+select '消费者评价', m.menu_id, 6, 'review', 'tcm/review/index', '', '', 1, 0, 'C', '0', '0', 'biz:review:list', 'message', 'admin', sysdate(), 'Review menu'
 from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
 and not exists (select 1 from sys_menu c where c.path = 'review' and c.component = 'tcm/review/index');
+
+insert into sys_menu(menu_name, parent_id, order_num, path, component, query, route_name, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark)
+select '草药促销', m.menu_id, 7, 'promo', 'tcm/promo/index', '', '', 1, 0, 'C', '0', '0', 'biz:promo:list', 'shopping', 'admin', sysdate(), 'Herb promotion page'
+from sys_menu m where m.path = 'tcm' and m.menu_type = 'M'
+and not exists (select 1 from sys_menu c where c.path = 'promo' and c.component = 'tcm/promo/index');
 
 -- 4) Buttons
 insert into sys_menu(menu_name,parent_id,order_num,path,component,query,route_name,is_frame,is_cache,menu_type,visible,status,perms,icon,create_by,create_time,remark)
@@ -253,6 +258,13 @@ insert into sys_role_menu(role_id, menu_id)
 select role.role_id, menu.menu_id
 from sys_role role
 join sys_menu menu on menu.path in ('tcm', 'dashboard', 'base', 'product', 'batch', 'process', 'trace')
+where role.role_key = 'tcm_enterprise'
+  and not exists (select 1 from sys_role_menu rm where rm.role_id = role.role_id and rm.menu_id = menu.menu_id);
+
+insert into sys_role_menu(role_id, menu_id)
+select role.role_id, menu.menu_id
+from sys_role role
+join sys_menu menu on menu.path = 'promo' and menu.component = 'tcm/promo/index'
 where role.role_key = 'tcm_enterprise'
   and not exists (select 1 from sys_role_menu rm where rm.role_id = role.role_id and rm.menu_id = menu.menu_id);
 

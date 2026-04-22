@@ -1,0 +1,36 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2D6A4F" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#40916C" stop-opacity="0.10"/>
+    </linearGradient>
+    <radialGradient id="g2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(900 250) rotate(140) scale(520 360)">
+      <stop stop-color="#BC6C25" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#BC6C25" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- soft circles -->
+  <circle cx="920" cy="260" r="300" fill="url(#g2)"/>
+  <circle cx="280" cy="610" r="260" fill="url(#g1)"/>
+
+  <!-- herb leaves (simple line-art) -->
+  <g opacity="0.16" stroke="#1B4332" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M250 520c90-180 240-280 450-300"/>
+    <path d="M340 485c28-85 86-152 170-198"/>
+    <path d="M445 445c40-60 92-104 156-132"/>
+    <path d="M520 410c20-36 48-66 84-90"/>
+    <path d="M285 560c40-10 76-10 110 0"/>
+    <path d="M392 558c56-18 112-18 168 0"/>
+    <path d="M560 560c60-22 120-22 180 0"/>
+  </g>
+
+  <!-- seal-like stamp -->
+  <g opacity="0.10">
+    <circle cx="930" cy="560" r="86" stroke="#1B4332" stroke-width="8"/>
+    <circle cx="930" cy="560" r="62" stroke="#1B4332" stroke-width="6" stroke-dasharray="10 10"/>
+    <path d="M900 560h60" stroke="#1B4332" stroke-width="10" stroke-linecap="round"/>
+    <path d="M930 530v60" stroke="#1B4332" stroke-width="10" stroke-linecap="round"/>
+  </g>
+</svg>
+
